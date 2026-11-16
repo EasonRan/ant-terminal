@@ -123,6 +123,14 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
 .rb{height:5px;border-radius:3px;background:var(--line);margin:8px 0 10px;overflow:hidden}.rb i{display:block;height:100%;background:var(--accent);border-radius:3px}
 .rr{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--muted)}.rr b{font-size:15px;font-weight:600}
 .ra{margin-top:8px;font-size:12.5px;color:var(--ink2)}
+
+.say{margin:0 0 14px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:14px;line-height:1.7}
+.say b{color:var(--accent);font-family:var(--mono);font-weight:700}
+.say.flash{animation:flash .5s ease-out}
+@keyframes flash{from{background:var(--accent-mid)}to{background:var(--accent-soft)}}
+.intro p{margin:0 0 10px;color:var(--ink);font-size:14.5px}
+.intro ul{margin:0;padding-left:18px;color:var(--ink2);font-size:13.5px;display:grid;gap:6px}
+.intro b{color:var(--ink)}
 .note{color:var(--muted);font-size:12.5px;margin:12px 0 0}
 .src{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 28px}
 .src div{padding:10px 0;border-bottom:1px dashed var(--line)}
@@ -197,8 +205,22 @@ td.h{transition:background-color .25s}
   </dl>
 
   <section class="panel">
+    <div class="ph"><h2>ANT 是什么</h2><p>数字来自招股书</p></div>
+    <div class="pb intro">
+      <p>ANT 是 Anthropic 的股票代码。Anthropic 是做 Claude 的人工智能公司，主要靠向企业和个人卖 AI 模型的使用量和订阅赚钱，直接对手是谷歌和 OpenAI。</p>
+      <ul>
+        <li><b>长得快</b>：2026 年三季度收入 170 亿美元，是一年前的 12 倍多；前三季度已经开始自己挣到现金（经营现金流 +66 亿美元）。</li>
+        <li><b>花得也多</b>：签了约 9,000 亿美元的算力合同，其中约 707 亿要在一年内付。</li>
+        <li><b>这次上市</b>：发行 8.25 亿股，区间 70–78 美元，募资约 578–644 亿美元。按已发行股数算，公司估值约 0.92–1.02 万亿美元；把期权等都算上，约 1.26–1.41 万亿。</li>
+        <li><b>上市后会有更多股票可以卖</b>：上市第一天员工最多可卖约 3.16 亿股，之后约 12-15、1-05、1-19、2-02 各放出约 3 亿股。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="panel">
     <div class="ph"><h2><small>STEP 1</small>开盘前：开盘价会落在哪</h2><p>历史定价规律与市场盘口，按各自误差大小加权</p></div>
-    <div class="pb two">
+    <div class="pb"><p class="say" id="say1"></p></div>
+    <div class="pb two" style="padding-top:0">
       <div>
         <div class="ctl">
           <label class="f">发行价<span class="box"><i>$</i><input type="number" id="offer" value="78" step="1" min="40" inputmode="decimal"></span></label>
@@ -219,6 +241,7 @@ td.h{transition:background-color .25s}
   <section class="panel">
     <div class="ph"><h2><small>STEP 2</small>开盘后：填入开盘价，看后面的区间</h2><p>拖动滑杆，下面所有数字实时变化</p></div>
     <div class="pb">
+      <p class="say" id="say2"></p>
       <div class="slider">
         <div class="top">
           <div><div class="f" style="margin-bottom:4px">开盘价 / 你的买入价</div><div class="big"><b class="num" id="openBig">$95.0</b><span id="openPrem">+22%</span></div></div>
@@ -242,6 +265,7 @@ td.h{transition:background-color .25s}
   <section class="panel">
     <div class="ph"><h2>交易规则情景：头两个交易日</h2><p>改动参数，看四种结果各占多少</p></div>
     <div class="pb">
+      <p class="say" id="say3"></p>
       <div class="ctl c3" style="max-width:520px">
         <label class="f">投入金额<span class="box"><i>$</i><input type="number" id="stake" value="10000" step="1000" inputmode="numeric"></span></label>
         <label class="f">止盈线<span class="box"><input type="number" id="tp" value="40" step="5" inputmode="numeric"><i>%</i></span></label>
@@ -254,7 +278,7 @@ td.h{transition:background-color .25s}
 
   <section class="panel">
     <div class="ph"><h2>价位地图：每个价位在几天内被碰到的概率</h2><p>颜色越深，概率越高；按上面的开盘价计算</p></div>
-    <div class="pb"><div class="scroll"><table id="mapTbl"></table></div></div>
+    <div class="pb"><p class="say">怎么看：每一行是一个价位，每一格是"这段时间里，价格到过这个位置"的可能性。红色是往上涨到，绿色是往下跌到，颜色越深越可能。数字都是历史上类似新股的发生频率，误差大约正负 15 个百分点。</p><div class="scroll"><table id="mapTbl"></table></div></div>
   </section>
 
   <section class="panel">
@@ -382,9 +406,19 @@ function renderMap(){const open=val('open'),offer=val('offer');
   $('mapTbl').innerHTML=h}
 function renderSim(){const t=N.slice().sort((a,b)=>b.w-a.w).slice(0,12),c=v=>v==null?'<td class="n">—</td>':`<td class="n ${cls(v)}">${pct(v)}</td>`;
   $('simTbl').innerHTML='<tr><th>代码</th><th>权重</th><th>头两天最高</th><th>头两天最低</th><th>第 2 天收盘</th><th>第 27 天收盘</th><th>半年内最低</th><th>第 126 天收盘</th></tr>'+t.map(n=>`<tr><td class="num">${n.s}</td><td class="n">${fmt(n.w*100,1)}%</td>${c(n.hi2)}${c(n.lo2)}${c(n.c2)}${c(n.c27)}${c(n.lo126)}${c(n.c126)}</tr>`).join('')}
+
+function say(id,html){const e=$(id);if(e.innerHTML===html)return;e.innerHTML=html;if(e.classList){e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash')}}
+function chance(p){return p>=.85?'基本都能':p>=.65?'多半能':p>=.45?'一半一半':p>=.25?'多半不能':'很难'}
+function saySteps(m){const L=val('limit'),open=val('open'),offer=m.offer,prem=open/offer-1,f=m.fill(L);
+  say('say1',`大白话：按现在的信息，开盘价最可能在 <b>${usd(m.q(0))}</b> 上下，有一半的可能落在 <b>${usd(m.q(Z.p25))}–${usd(m.q(Z.p75))}</b>。你把限价挂在 <b>${usd(L)}</b>，${chance(f)}买到（大约 10 次里 ${Math.round(f*10)} 次）。限价是你最多愿意付的价，实际按开盘价成交；开盘价比限价高就买不到。`);
+  const grp=prem<0?'开在发行价下面，这种情况很少见，说明市场很冷':prem<.2?'开盘只比发行价高一点。历史上这一档的 9 只新股，半年内全部跌回过发行价':prem<.5?'开盘比发行价高两到五成。历史上这一档的新股，半年内约有一半跌回过发行价':'开盘比发行价高五成以上。历史上这一档的新股，跌回发行价的约三成，但开盘后再往上的空间也最小';
+  const z=(k,q)=>usd(open*(1+wq(k,q)));
+  say('say2',`大白话：假如开在 <b>${usd(open,1)}</b>（比发行价 ${pct(prem)}），${grp}。头两天，最高价多半在 <b>${z('hi2',.25)}–${z('hi2',.75)}</b>，最低价多半在 <b>${z('lo2',.25)}–${z('lo2',.75)}</b>；到 12 月底，最低价多半在 <b>${z('lo27',.25)}–${z('lo27',.75)}</b>。`);
+  const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/100,pA=prob(n=>n.c2==null?null:n.hi2>=tp),pD=prob(n=>n.c2==null?null:(n.hi2<tp&&n.c2<-sl)),pUp=prob(n=>n.c2==null?null:(n.hi2>=tp||n.c2>0));
+  say('say3',`大白话：投 <b>${usd(stake)}</b>，止盈线 ${pct(tp)}。头两天里，碰到止盈线的可能是 <b>${fmt(pA*100)}%</b>（赚约 ${usd(stake*tp)}）；两天后是赚的可能合计 <b>${fmt(pUp*100)}%</b>；亏超过 ${fmt(sl*100)}% 的可能是 <b>${fmt(pD*100)}%</b>（亏约 ${usd(stake*Math.abs(wavg('c2',n=>n.hi2<tp&&n.c2<-sl)))}）。`)}
 let raf=0;
-function all(){const m=openModel();renderOpen(m);setOpenRange(m);renderFan();renderRules();renderMap()}
-function fast(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;renderFan();renderRules();renderMap()})}
+function all(){const m=openModel();renderOpen(m);setOpenRange(m);renderFan();renderRules();renderMap();saySteps(m)}
+function fast(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;renderFan();renderRules();renderMap();saySteps(openModel())})}
 $('built').textContent='数据截至 '+DATA.built;$('nsamp').textContent=DATA.n;
 for(const id of ['offer','above','perp','pm','limit'])$(id).addEventListener('input',all);
 for(const id of ['stake','tp','sl'])$(id).addEventListener('input',fast);
