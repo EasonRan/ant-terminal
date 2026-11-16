@@ -1,6 +1,5 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>ANT 价位终端</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-
 <style>
 /* 布局：一条报价带 + 自上而下的研究终端面板；数字全部等宽对齐；全页只有一个强调色（琥珀），红涨绿跌只用于涨跌含义 */
 :root{
@@ -10,34 +9,18 @@
   --fan:#6f9fe0;--fan1:rgba(111,159,224,.17);--fan2:rgba(111,159,224,.40);
   --up:#f0625a;--down:#35b98f;--up-soft:rgba(240,98,90,.38);--down-soft:rgba(53,185,143,.38);
   --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px -18px rgba(0,0,0,.8);
-  --sans:"IBM Plex Sans","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
-  --mono:"IBM Plex Mono","SF Mono",Menlo,Consolas,"PingFang SC",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","HarmonyOS Sans SC","MiSans","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --mono:"DIN Alternate","DIN Pro","Bahnschrift","Roboto Condensed","HarmonyOS Sans SC","SF Pro Display",-apple-system,"PingFang SC",sans-serif;
   color-scheme:dark;
 }
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
-  --bg:#f3f5f8;--panel:#ffffff;--panel2:#f8fafc;--line:#dfe5ec;--line2:#c9d3de;
-  --ink:#101823;--ink2:#34424f;--muted:#617182;
-  --accent:#a36200;--accent-soft:rgba(163,98,0,.10);--accent-mid:rgba(163,98,0,.34);
-  --fan:#2b63b3;--fan1:rgba(43,99,179,.12);--fan2:rgba(43,99,179,.28);
-  --up:#c9342c;--down:#0c8660;--up-soft:rgba(201,52,44,.30);--down-soft:rgba(12,134,96,.30);
-  --shadow:0 1px 2px rgba(16,24,35,.05),0 12px 28px -22px rgba(16,24,35,.35);
-  color-scheme:light}}
-:root[data-theme="light"]{
-  --bg:#f3f5f8;--panel:#ffffff;--panel2:#f8fafc;--line:#dfe5ec;--line2:#c9d3de;
-  --ink:#101823;--ink2:#34424f;--muted:#617182;
-  --accent:#a36200;--accent-soft:rgba(163,98,0,.10);--accent-mid:rgba(163,98,0,.34);
-  --fan:#2b63b3;--fan1:rgba(43,99,179,.12);--fan2:rgba(43,99,179,.28);
-  --up:#c9342c;--down:#0c8660;--up-soft:rgba(201,52,44,.30);--down-soft:rgba(12,134,96,.30);
-  --shadow:0 1px 2px rgba(16,24,35,.05),0 12px 28px -22px rgba(16,24,35,.35);
-  color-scheme:light}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding-block:22px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
-.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:.01em}
 /* 顶部报价带 */
 .mast{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px;padding-bottom:14px;border-bottom:1px solid var(--line2)}
 .tick{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.tick h1{margin:0;font:600 34px/1 var(--mono);letter-spacing:.02em}
+.tick h1{margin:0;font:700 40px/1 var(--mono);letter-spacing:.04em}
 .tick h1 span{color:var(--accent)}
 .tick p{margin:0;color:var(--ink2);font-size:14px}
 .ver{color:var(--muted);font-size:12.5px;text-align:right}
@@ -119,7 +102,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-w
 .rg .val em{font-style:normal;color:var(--muted);font-size:12px;display:block}
 .rg.up{--c1:var(--up-soft);--c2:var(--up);--c3:var(--ink)}
 .rg.dn{--c1:var(--down-soft);--c2:var(--down);--c3:var(--ink)}
-@media (max-width:640px){.rg{grid-template-columns:minmax(0,1fr) auto}.rg .bar{grid-column:1/-1;order:3}}
 /* 表 */
 .scroll{overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-size:13.5px}
@@ -127,12 +109,12 @@ th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;whit
 th:first-child,td:first-child{text-align:left}
 th{font:500 11.5px var(--sans);color:var(--muted);letter-spacing:.04em;background:var(--panel2);position:sticky;top:0}
 td.n{font-family:var(--mono);font-variant-numeric:tabular-nums}
-td.t{text-align:left;white-space:normal;color:var(--ink2);min-width:150px}
+td.t{text-align:left;color:var(--ink2)}
 tr:last-child td{border-bottom:0}
 .pbar{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end;min-width:120px}
 .pbar i{display:block;width:64px;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
 .pbar i b{display:block;height:100%;background:var(--accent);border-radius:3px}
-td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;background:var(--hc,transparent)}
+td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;background:var(--hc,transparent);border-left:2px solid var(--panel)}
 .pos{color:var(--up)}.neg{color:var(--down)}
 .note{color:var(--muted);font-size:12.5px;margin:12px 0 0}
 .src{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 28px}
@@ -142,6 +124,29 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;background:var(--
 .foot{color:var(--muted);font-size:12px;text-align:center}
 #tip{position:fixed;z-index:20;pointer-events:none;background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:8px 11px;font-size:12.5px;box-shadow:0 8px 24px -8px rgba(0,0,0,.5);line-height:1.6}
 #tip b{font-weight:600}
+
+@media (max-width:640px){
+  body{font-size:14px}
+  .wrap{gap:12px;padding-block:14px 40px}
+  .tick h1{font-size:34px}.tick p{font-size:12.5px}.ver{text-align:left;font-size:11.5px}
+  .strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .strip div{padding:8px 10px}.strip dt{font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.strip dd{font-size:14px;white-space:nowrap}
+  .ph{padding:12px 14px 10px}.ph h2{font-size:15px}.ph p{display:none}
+  .pb{padding:12px 14px 14px}
+  .ctl{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .f{white-space:nowrap}
+  .stats dt{font-size:12.5px}.stats dd{font-size:15px}.stats dd em{display:block;margin:0;text-align:right;font-size:11.5px}
+  .stats .hero dd{font-size:24px}
+  .big b{font-size:36px}.big span{font-size:12.5px;white-space:nowrap}
+  .btns{width:100%}.btns button{flex:1;padding:8px 4px;white-space:nowrap}
+  .seg{width:100%}.seg button{flex:1;padding:8px 4px;white-space:nowrap}
+  .legend{font-size:11.5px;gap:4px 12px}
+  .rg{grid-template-columns:minmax(0,1fr) auto;gap:2px 8px}.rg .bar{grid-column:1/-1;order:3}
+  .rg .val{font-size:14px}.rg .val em{display:inline;margin-left:6px;font-size:11px}
+  th,td{padding:8px 7px;font-size:12.5px}td.h{font-size:14px}
+  th{font-size:10.5px;letter-spacing:0}
+  .src{grid-template-columns:minmax(0,1fr)}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -149,18 +154,18 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;background:var(--
   <header class="mast">
     <div class="tick">
       <h1><span>ANT</span></h1>
-      <p>Anthropic, PBC　·　纳斯达克　·　预计美东 11-18 定价、11-19 开始交易</p>
+      <p>Anthropic · 纳斯达克 · 11-19 上市</p>
     </div>
     <div class="ver">价位概率模型 v3　·　<span id="built"></span><br>样本 <span id="nsamp"></span> 只美国科技新股，按与 ANT 的相似度加权</div>
   </header>
 
   <dl class="strip">
-    <div><dt>发行区间</dt><dd>$70 – $78</dd></div>
-    <div><dt>发行股数</dt><dd>8.25 亿股</dd></div>
-    <div><dt>募资规模</dt><dd>$578 – $644 亿</dd></div>
-    <div><dt>认购倍数（彭博）</dt><dd>约 6 倍</dd></div>
-    <div><dt>发行后总股数</dt><dd>130.9 亿股</dd></div>
-    <div><dt>10 年美债 / 纳指距高点</dt><dd>5.15% / −8.9%</dd></div>
+    <div><dt>发行区间</dt><dd>$70–78</dd></div>
+    <div><dt>发行股数</dt><dd>8.25 亿</dd></div>
+    <div><dt>募资（亿美元）</dt><dd>578–644</dd></div>
+    <div><dt>认购倍数</dt><dd>约 6 倍</dd></div>
+    <div><dt>总股数</dt><dd>130.9 亿</dd></div>
+    <div><dt>10 年美债</dt><dd>5.15%</dd></div>
   </dl>
 
   <section class="panel">
@@ -171,7 +176,7 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;background:var(--
           <label class="f">发行价<span class="box"><i>$</i><input type="number" id="offer" value="78" step="1" min="40" inputmode="decimal"></span></label>
           <label class="f">定价方式<span class="box"><select id="above"><option value="0">区间内定价</option><option value="1">直接高于区间</option></select></span></label>
           <label class="f">场外合约价<span class="box"><i>$</i><input type="number" id="perp" value="99.4" step="0.5" inputmode="decimal"></span></label>
-          <label class="f">Polymarket 首日收盘中位<span class="box"><i>$</i><input type="number" id="pm" value="106.5" step="0.5" inputmode="decimal"></span></label>
+          <label class="f">预测市场收盘价<span class="box"><i>$</i><input type="number" id="pm" value="106.5" step="0.5" inputmode="decimal"></span></label>
           <label class="f">你的限价<span class="box"><i>$</i><input type="number" id="limit" value="105" step="1" inputmode="decimal"></span></label>
         </div>
         <dl class="stats" id="openStats"></dl>
@@ -274,7 +279,7 @@ function renderOpen(m){const L=val('limit');
    `<div><dt>一半的可能落在</dt><dd>${usd(m.q(Z.p25))} – ${usd(m.q(Z.p75))}</dd></div>`+
    `<div><dt>八成的可能落在</dt><dd>${usd(m.q(Z.p10))} – ${usd(m.q(Z.p90))}</dd></div>`+
    `<div><dt>限价 ${usd(L)} 能成交的概率</dt><dd>${fmt(m.fill(L)*100)}%</dd></div>`+
-   `<div><dt>历史规律给的中枢 / 市场盘口给的中枢</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}<em>权重 ${fmt(m.wH*100)} : ${fmt((1-m.wH)*100)}</em></dd></div>`;
+   `<div><dt>历史规律 / 市场盘口</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}<em>权重 ${fmt(m.wH*100)} : ${fmt((1-m.wH)*100)}</em></dd></div>`;
   // 密度图
   const narrow=($('dens').clientWidth||620)<460,W=narrow?400:620,H=narrow?230:250,ml=16,mr=16,mt=30,mb=42,pw=W-ml-mr,ph=H-mt-mb,x0=m.q(-2.6),x1=m.q(2.6);$('dens').setAttribute('viewBox',`0 0 ${W} ${H}`);
   const X=v=>ml+pw*(Math.log(v)-Math.log(x0))/(Math.log(x1)-Math.log(x0)),pdf=v=>Math.exp(-(((Math.log(v)-m.mu)/m.sd)**2)/2);
@@ -295,7 +300,7 @@ function setOpenRange(m){const el=$('open'),lo=Math.floor(m.offer*.8),hi=Math.ce
   const gap=Math.abs(m.q(0)-m.offer)/(hi-lo)>.09;
   $('scale').innerHTML=`<span style="--x:${P(m.offer)}">发行价<br>${usd(m.offer)}</span>`+(gap?`<span class="a" style="--x:${P(m.q(0))}">预测中位<br>${usd(m.q(0))}</span>`:'')+`<span style="--x:${P(lo+(hi-lo)*.97)}">${usd(hi)}</span>`}
 function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('tp')/100,sl=val('sl')/100;
-  $('openBig').textContent=usd(open,1);$('openPrem').textContent='比发行价 '+pct(open/offer-1);
+  $('openBig').textContent=usd(open,1);$('openPrem').textContent='较发行价 '+pct(open/offer-1);
   const narrow=($('fan').clientWidth||1100)<640,Wd=narrow?560:1100,Hd=narrow?400:420,ml=narrow?46:62,mr=narrow?112:150,mt=16,mb=36,pw=Wd-ml-mr,ph=Hd-mt-mb;$('fan').setAttribute('viewBox',`0 0 ${Wd} ${Hd}`);
   const idx=F.d.map((d,i)=>i).filter(i=>F.d[i]<=hz),G=k=>idx.map(i=>open*(1+F[k][i]));
   const refs=[['止盈 '+pct(tp),open*(1+tp),'var(--up)'],['买入价',open,'var(--ink2)'],['小亏线 '+pct(-sl),open*(1-sl),'var(--down)'],['−20%',open*.8,'var(--down)'],['−40%',open*.6,'var(--down)'],['发行价',offer,'var(--muted)']];
@@ -327,7 +332,7 @@ function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('t
 function renderRules(){const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/100;
   const A=n=>n.hi2>=tp,B=n=>!A(n)&&n.c2>0,C=n=>!A(n)&&n.c2<=0&&n.c2>=-sl,D=n=>!A(n)&&n.c2<-sl;
   const rows=[['盘中碰到止盈线 '+pct(tp),A,()=>tp,'按止盈价卖出',true],['没到止盈，第 2 天收盘是赚的',B,()=>wavg('c2',B),'减仓，压低成本'],['第 2 天收盘小亏（'+fmt(sl*100)+'% 以内）',C,()=>wavg('c2',C),'不卖，带仓位过周末'],['第 2 天收盘亏超过 '+fmt(sl*100)+'%',D,()=>wavg('c2',D),'规则待定']];
-  let h='<tr><th>头两天的结果</th><th>概率</th><th>平均涨跌</th><th>对应金额</th><th>之后到第 27 天（中位，相对买入价）</th><th style="text-align:left">对应规则</th></tr>';
+  let h='<tr><th>头两天结果</th><th>概率</th><th>平均涨跌</th><th>对应金额</th><th>到 12 月底中位</th><th style="text-align:left">对应规则</th></tr>';
   for(const [lab,f,avg,act,first] of rows){const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);
     h+=`<tr><td>${lab}</td><td><span class="pbar"><span class="num">${fmt(p*100)}%</span><i><b style="width:${Math.min(100,p*100)}%"></b></i></span></td><td class="n ${cls(a)}">${pct(a)}</td><td class="n ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</td><td class="n ${first?'':cls(m27)}">${first?'—':pct(m27)}</td><td class="t">${act}</td></tr>`}
   $('ruleTbl').innerHTML=h;
@@ -339,7 +344,7 @@ function renderMap(){const open=val('open'),offer=val('offer');
   let h='<tr><th>价位</th><th>相对买入价</th><th>1 天内</th><th>2 天内</th><th>5 天内</th><th>到 12 月底</th><th>半年内</th></tr>';
   for(const [v,dir] of up.concat(dn)){const r=v/open-1,isOffer=Math.abs(v-offer)<.005,col=dir==='涨到'?'--up':'--down';
     h+=`<tr><td><span style="color:var(${col})">${dir}</span> <span class="num">${usd(v,v<100?1:0)}</span>${isOffer?'　发行价':''}</td><td class="n">${pct(r)}</td>`;
-    for(const n of [1,2,5,27,126]){const p=prob(x=>dir==='涨到'?x['hi'+n]>=r:x['lo'+n]<=r);h+=`<td class="h" style="--hc:color-mix(in srgb,var(--accent) ${Math.round(p*46)}%,transparent)">${fmt(p*100)}%</td>`}
+    for(const n of [1,2,5,27,126]){const p=prob(x=>dir==='涨到'?x['hi'+n]>=r:x['lo'+n]<=r);h+=`<td class="h" style="--hc:color-mix(in srgb,var(${col}) ${Math.round(8+p*62)}%,transparent)">${fmt(p*100)}%</td>`}
     h+='</tr>'}
   $('mapTbl').innerHTML=h}
 function renderSim(){const t=N.slice().sort((a,b)=>b.w-a.w).slice(0,12),c=v=>v==null?'<td class="n">—</td>':`<td class="n ${cls(v)}">${pct(v)}</td>`;
