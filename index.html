@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>ANT 价位终端</title>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>老冉第一周 ANT 作战计划</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* 布局：一条报价带 + 自上而下的研究终端面板；数字全部等宽对齐；全页只有一个强调色（琥珀），红涨绿跌只用于涨跌含义 */
@@ -159,6 +159,22 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
   #mapTbl th,#mapTbl td{padding:9px 4px;text-align:center}#mapTbl th:first-child,#mapTbl td:first-child{text-align:left;padding-left:2px;white-space:nowrap}
   #mapTbl td.h{font-size:14.5px}
 }
+
+.plan{font:600 19px/1.3 var(--sans);letter-spacing:.02em}
+@keyframes rise{from{opacity:.0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes draw{from{stroke-dashoffset:var(--len,2000)}to{stroke-dashoffset:0}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--accent-mid)}50%{box-shadow:0 0 0 10px transparent}}
+.mast,.strip,.panel{animation:rise .7s cubic-bezier(.16,1,.3,1) both}
+.strip{animation-delay:.06s}.panel:nth-of-type(1){animation-delay:.12s}.panel:nth-of-type(2){animation-delay:.2s}.panel:nth-of-type(3){animation-delay:.28s}.panel:nth-of-type(n+4){animation-delay:.34s}
+.drawin{stroke-dasharray:var(--len,2000);animation:draw 1.1s cubic-bezier(.16,1,.3,1) .35s both}
+.rg .w,.rg .q,.rg .m,.rg .o{transition:left .28s cubic-bezier(.16,1,.3,1),width .28s cubic-bezier(.16,1,.3,1)}
+.rb i,.pbar i b{transform-origin:left;animation:grow .6s cubic-bezier(.16,1,.3,1) both}
+.track.hint input::-webkit-slider-thumb{animation:pulse 1.6s ease-in-out 3}
+td.h{transition:background-color .25s}
+.big b{transition:color .2s}
+@media (max-width:640px){.plan{font-size:17px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -166,7 +182,7 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
   <header class="mast">
     <div class="tick">
       <h1><span>ANT</span></h1>
-      <p>Anthropic · 纳斯达克 · 11-19 上市</p>
+      <div><div class="plan">老冉第一周 ANT 作战计划</div><p>Anthropic · 纳斯达克 · 11-19 上市</p></div>
     </div>
     <div class="ver">价位概率模型 v3　·　<span id="built"></span><br>样本 <span id="nsamp"></span> 只美国科技新股，按与 ANT 的相似度加权</div>
   </header>
@@ -208,7 +224,7 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
           <div><div class="f" style="margin-bottom:4px">开盘价 / 你的买入价</div><div class="big"><b class="num" id="openBig">$95.0</b><span id="openPrem">+22%</span></div></div>
           <div class="btns"><button type="button" id="b25">偏低情形</button><button type="button" id="b50">预测中位数</button><button type="button" id="b75">偏高情形</button></div>
         </div>
-        <div class="track" id="track"><div class="rail"></div><div class="band"></div><div class="mk" id="mkOffer"></div><div class="mk med" id="mkMed"></div><input type="range" id="open" min="60" max="170" step="0.5" value="95" aria-label="开盘价"></div>
+        <div class="track hint" id="track"><div class="rail"></div><div class="band"></div><div class="mk" id="mkOffer"></div><div class="mk med" id="mkMed"></div><input type="range" id="open" min="60" max="170" step="0.5" value="95" aria-label="开盘价"></div>
         <div class="scale" id="scale"></div>
       </div>
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:14px">
@@ -324,7 +340,7 @@ function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('t
   let s='';for(let t=Math.ceil(lo/step)*step;t<=hi;t+=step)s+=`<line x1="${ml}" x2="${ml+pw}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${ml-(narrow?6:10)}" y="${y(t)+4}" text-anchor="end" font-size="${narrow?11:12}" font-family="var(--mono)" fill="var(--muted)">${usd(t)}</text>`;
   const xt=narrow?(hz<=10?[1,3,5,7,10]:hz<=27?[1,10,20,27]:[1,48,76,126]):(hz<=10?[1,2,3,5,7,10]:hz<=27?[1,5,10,15,20,27]:[1,27,48,62,76,100,126]);
   for(const d of xt){const i=F.d.indexOf(d);s+=`<text x="${x(i)}" y="${Hd-12}" text-anchor="${d===1?'start':'middle'}" font-size="12" fill="var(--muted)">第 ${d} 天</text>`}
-  s+=`<path d="${band('p10','p90')}" fill="var(--fan1)"/><path d="${band('p25','p75')}" fill="var(--fan2)"/><path d="${path('p50')}" fill="none" stroke="var(--fan)" stroke-width="2.4" stroke-linejoin="round"/>`;
+  s+=`<path d="${band('p10','p90')}" fill="var(--fan1)"/><path d="${band('p25','p75')}" fill="var(--fan2)"/><path d="${path('p50')}" fill="none" stroke="var(--fan)" stroke-width="2.4" stroke-linejoin="round" class="${S.drawn===hz?'':'drawin'}"/>`;S.drawn=hz;
   const used=[];refs.sort((a,b)=>b[1]-a[1]);
   for(const [lab,v,col] of refs){if(v<lo||v>hi)continue;const yy=y(v);s+=`<line x1="${ml}" x2="${ml+pw}" y1="${yy}" y2="${yy}" stroke="${col}" stroke-width="1.3" stroke-dasharray="${lab==='买入价'?'1 5':'6 5'}"/>`;
     let ty=yy+4;for(const u of used)if(Math.abs(ty-u)<15)ty=u+15;used.push(ty);
@@ -340,7 +356,11 @@ function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('t
   const rows=[['hi2','头两天最高','up'],['lo2','头两天最低','dn'],['lo5','头 5 天最低','dn'],['lo27','到 12 月底最低','dn'],['hi27','到 12 月底最高','up'],['lo126','半年内最低','dn'],['hi126','半年内最高','up']];
   const all=rows.map(([k])=>[.1,.25,.5,.75,.9].map(q=>open*(1+wq(k,q))));
   const a=Math.min(offer,...all.map(r=>r[0]))*.95,b=Math.max(...all.map(r=>r[4]))*1.03,PX=v=>((Math.log(v)-Math.log(a))/(Math.log(b)-Math.log(a))*100).toFixed(2)+'%',PW=(u,v)=>((Math.log(v)-Math.log(u))/(Math.log(b)-Math.log(a))*100).toFixed(2)+'%';
-  $('ranges').innerHTML=rows.map(([k,lab,c],i)=>{const r=all[i];return `<div class="rg ${c}"><div class="lab">${lab}</div><div class="bar"><span class="w" style="left:${PX(r[0])};width:${PW(r[0],r[4])}"></span><span class="q" style="left:${PX(r[1])};width:${PW(r[1],r[3])}"></span><span class="m" style="left:${PX(r[2])}"></span><span class="o" style="left:${PX(offer)}"></span></div><div class="val">${usd(r[1])} – ${usd(r[3])}<em>中位 ${usd(r[2])}（${pct(r[2]/open-1)}）</em></div></div>`}).join('')}
+  const box=$('ranges');
+  if(!box.children||box.children.length!==rows.length){box.innerHTML=rows.map(([k,lab,c])=>`<div class="rg ${c}"><div class="lab">${lab}</div><div class="bar"><span class="w"></span><span class="q"></span><span class="m"></span><span class="o"></span></div><div class="val"></div></div>`).join('')}
+  rows.forEach((row,i)=>{const r=all[i],el=box.children&&box.children[i];if(!el||!el.querySelector)return;const st=(s,l,w)=>{const e=el.querySelector(s);e.style.left=l;if(w)e.style.width=w};
+    st('.w',PX(r[0]),PW(r[0],r[4]));st('.q',PX(r[1]),PW(r[1],r[3]));st('.m',PX(r[2]));st('.o',PX(offer));
+    el.querySelector('.val').innerHTML=`${usd(r[1])} – ${usd(r[3])}<em>中位 ${usd(r[2])}（${pct(r[2]/open-1)}）</em>`})}
 function renderRules(){const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/100;
   const A=n=>n.hi2>=tp,B=n=>!A(n)&&n.c2>0,C=n=>!A(n)&&n.c2<=0&&n.c2>=-sl,D=n=>!A(n)&&n.c2<-sl;
   const rows=[['盘中碰到止盈线 '+pct(tp),A,()=>tp,'按止盈价卖出',true],['没到止盈，第 2 天收盘是赚的',B,()=>wavg('c2',B),'减仓，压低成本'],['第 2 天收盘小亏（'+fmt(sl*100)+'% 以内）',C,()=>wavg('c2',C),'不卖，带仓位过周末'],['第 2 天收盘亏超过 '+fmt(sl*100)+'%',D,()=>wavg('c2',D),'补仓，买入更多']];
@@ -368,7 +388,7 @@ function fast(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;renderFan();r
 $('built').textContent='数据截至 '+DATA.built;$('nsamp').textContent=DATA.n;
 for(const id of ['offer','above','perp','pm','limit'])$(id).addEventListener('input',all);
 for(const id of ['stake','tp','sl'])$(id).addEventListener('input',fast);
-$('open').addEventListener('input',fast);
+$('open').addEventListener('input',()=>{$('track').classList.remove('hint');fast()});
 const jump=z=>()=>{const v=Math.round(openModel().q(z)*2)/2;$('open').value=v;fast()};
 $('b25').addEventListener('click',jump(Z.p25));$('b50').addEventListener('click',jump(0));$('b75').addEventListener('click',jump(Z.p75));
 for(const b of $('hz').children)b.addEventListener('click',()=>{S.hz=+b.dataset.v;for(const o of $('hz').children)o.setAttribute('aria-pressed',o===b?'true':'false');renderFan()});
