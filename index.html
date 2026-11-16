@@ -133,6 +133,17 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
 .intro ul{margin:0;padding-left:18px;color:var(--ink2);font-size:13.5px;display:grid;gap:6px}
 .intro b{color:var(--ink)}
 .how{margin:0;text-align:center;color:var(--ink2);font-size:13.5px}.how b{color:var(--accent);font-weight:600;margin:0 4px}
+
+details.more{margin-top:12px}
+details.more summary,.fold summary{cursor:pointer;list-style:none}
+details.more summary::-webkit-details-marker,.fold summary::-webkit-details-marker{display:none}
+details.more summary{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2);padding:6px 12px;border:1px solid var(--line2);border-radius:999px}
+details.more summary::after,.fold summary h2::after{content:"展开";font:500 11.5px var(--sans);color:var(--accent);margin-left:8px}
+details.more[open] summary::after,.fold details[open] summary h2::after{content:"收起"}
+details.more .ctl{margin-top:12px}
+.fold details:not([open]) summary{border-bottom:0}
+.fold summary:focus-visible,details.more summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ra span{display:inline-block;font-size:11px;color:var(--accent);border:1px solid var(--accent-mid);border-radius:999px;padding:1px 8px;margin-right:8px}
 .note{color:var(--muted);font-size:12.5px;margin:12px 0 0}
 .src{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 28px}
 .src div{padding:10px 0;border-bottom:1px dashed var(--line)}
@@ -228,11 +239,14 @@ td.h{transition:background-color .25s}
       <div>
         <div class="ctl">
           <label class="f">发行价<span class="box"><i>$</i><input type="number" id="offer" value="78" step="1" min="40" inputmode="decimal"></span><small>公司卖给机构的价</small></label>
+          <label class="f">你的限价<span class="box"><i>$</i><input type="number" id="limit" value="105" step="1" inputmode="decimal"></span><small>你最多愿意付的价</small></label>
+        </div>
+        <details class="more"><summary>更多设置（一般不用改）</summary><div class="ctl">
           <label class="f">定价方式<span class="box"><select id="above"><option value="0">区间内定价</option><option value="1">直接高于区间</option></select></span><small>最终价在不在区间内</small></label>
           <label class="f">场外押注价<span class="box"><i>$</i><input type="number" id="perp" value="99.4" step="0.5" inputmode="decimal"></span><small>上市前市场押的价</small></label>
           <label class="f">首日收盘押注价<span class="box"><i>$</i><input type="number" id="pm" value="106.5" step="0.5" inputmode="decimal"></span><small>预测网站押的首日收盘</small></label>
-          <label class="f">你的限价<span class="box"><i>$</i><input type="number" id="limit" value="105" step="1" inputmode="decimal"></span><small>你最多愿意付的价</small></label>
-        </div>
+        </div></details>
+        <div hidden></div>
         <dl class="stats" id="openStats"></dl>
       </div>
       <div>
@@ -285,13 +299,11 @@ td.h{transition:background-color .25s}
     <div class="pb"><p class="say">怎么看：每行一个价位，每格是这段时间里到过这个价的可能性。红色是涨到，绿色是跌到，越深越可能。</p><div class="scroll"><table id="mapTbl"></table></div></div>
   </section>
 
-  <section class="panel">
-    <div class="ph"><h2>和 ANT 最像的 12 只新股</h2><p>它们上市后各自怎么走的</p></div>
+  <section class="panel fold"><details><summary class="ph"><h2>和 ANT 最像的 12 只新股</h2><p>它们上市后各自怎么走的</p></summary>
     <div class="pb"><div class="scroll"><table id="simTbl"></table></div></div>
-  </section>
+  </details></section>
 
-  <section class="panel">
-    <div class="ph"><h2>这些数字从哪来</h2><p>数据和算法</p></div>
+  <section class="panel fold"><details><summary class="ph"><h2>这些数字从哪来</h2><p>数据和算法</p></summary>
     <div class="pb">
       <dl class="src">
         <div><dt>发行条款</dt><dd>美国证监会 EDGAR：Anthropic S-1/A 招股书（2026-11-10）与上市材料 FWP（2026-11-12）。发行区间、股数、解禁时间表均取自原文。</dd></div>
@@ -305,7 +317,7 @@ td.h{transition:background-color .25s}
         <div><dt>局限</dt><dd>样本里没有在 10 年美债 5% 以上上市的先例；与 ANT 体量相当的只有 SpaceX 一只；场外合约的准确度只有两次先例可查。</dd></div>
       </dl>
     </div>
-  </section>
+  </details></section>
 
   <p class="foot">这些都是按历史算出来的可能性，不是保证，也不构成投资建议。百分比都是和开盘价比。</p>
 </div>
@@ -392,11 +404,11 @@ function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('t
 function renderRules(){const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/100;
   const A=n=>n.hi2>=tp,B=n=>!A(n)&&n.c2>0,C=n=>!A(n)&&n.c2<=0&&n.c2>=-sl,D=n=>!A(n)&&n.c2<-sl;
   const rows=[['盘中碰到止盈线 '+pct(tp),A,()=>tp,'按止盈价卖出',true],['没到止盈，第 2 天收盘是赚的',B,()=>wavg('c2',B),'减仓，压低成本'],['第 2 天收盘小亏（'+fmt(sl*100)+'% 以内）',C,()=>wavg('c2',C),'不卖，带仓位过周末'],['第 2 天收盘亏超过 '+fmt(sl*100)+'%',D,()=>wavg('c2',D),'补仓，买入更多']];
-  let h='<tr><th>头两天结果</th><th>概率</th><th>平均涨跌</th><th>对应金额</th><th>到 12 月底中位</th><th style="text-align:left">对应规则</th></tr>';
+  let h='<tr><th>头两天结果</th><th>概率</th><th>平均涨跌</th><th>对应金额</th><th>到 12 月底中位</th><th style="text-align:left">老冉的想法</th></tr>';
   for(const [lab,f,avg,act,first] of rows){const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);
     h+=`<tr><td>${lab}</td><td><span class="pbar"><span class="num">${fmt(p*100)}%</span><i><b style="width:${Math.min(100,p*100)}%"></b></i></span></td><td class="n ${cls(a)}">${pct(a)}</td><td class="n ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</td><td class="n ${first?'':cls(m27)}">${first?'—':pct(m27)}</td><td class="t">${act}</td></tr>`}
   $('ruleTbl').innerHTML=h;
-  $('ruleCards').innerHTML=rows.map(([lab,f,avg,act,first])=>{const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);return `<div class="rc"><div class="rt"><span>${lab}</span><b class="num">${fmt(p*100)}%</b></div><div class="rb"><i style="width:${Math.min(100,p*100)}%"></i></div><div class="rr"><span>平均 <b class="num ${cls(a)}">${pct(a)}</b></span><span>约 <b class="num ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</b></span><span>${first?'':'到 12 月底 <b class="num '+cls(m27)+'">'+pct(m27)+'</b>'}</span></div><div class="ra">${act}</div></div>`}).join('');
+  $('ruleCards').innerHTML=rows.map(([lab,f,avg,act,first])=>{const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);return `<div class="rc"><div class="rt"><span>${lab}</span><b class="num">${fmt(p*100)}%</b></div><div class="rb"><i style="width:${Math.min(100,p*100)}%"></i></div><div class="rr"><span>平均 <b class="num ${cls(a)}">${pct(a)}</b></span><span>约 <b class="num ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</b></span><span>${first?'':'到 12 月底 <b class="num '+cls(m27)+'">'+pct(m27)+'</b>'}</span></div><div class="ra"><span>老冉的想法</span>${act}</div></div>`}).join('');
   const g=fn=>fmt(prob(fn)*100)+'%';
   $('ruleNote').textContent=`多等几天，碰到止盈线的可能会变大：5 天内 ${g(n=>n.hi5>=tp)}，到 12 月底 ${g(n=>n.hi27>=tp)}。`}
 function renderMap(){const open=val('open'),offer=val('offer');
