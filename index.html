@@ -43,6 +43,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-w
 .f .box{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:0 10px;height:38px;transition:border-color .15s,box-shadow .15s}
 .f .box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .f .box i{font:500 13px var(--mono);color:var(--muted);font-style:normal}
+.f small{font-size:11px;color:var(--muted);white-space:normal;line-height:1.35;opacity:.85}
 .f input[type=number],.f select{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:var(--ink);font:500 15px var(--mono);font-variant-numeric:tabular-nums;height:36px}
 .f select{font-family:var(--sans);font-size:13.5px}
 /* 读数列表 */
@@ -131,6 +132,7 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
 .intro p{margin:0 0 10px;color:var(--ink);font-size:14.5px}
 .intro ul{margin:0;padding-left:18px;color:var(--ink2);font-size:13.5px;display:grid;gap:6px}
 .intro b{color:var(--ink)}
+.how{margin:0;text-align:center;color:var(--ink2);font-size:13.5px}.how b{color:var(--accent);font-weight:600;margin:0 4px}
 .note{color:var(--muted);font-size:12.5px;margin:12px 0 0}
 .src{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 28px}
 .src div{padding:10px 0;border-bottom:1px dashed var(--line)}
@@ -192,7 +194,7 @@ td.h{transition:background-color .25s}
       <h1><span>ANT</span></h1>
       <div><div class="plan">老冉第一周 ANT 作战计划</div><p>Anthropic · 纳斯达克 · 11-19 上市</p></div>
     </div>
-    <div class="ver">价位概率模型 v3　·　<span id="built"></span><br>样本 <span id="nsamp"></span> 只美国科技新股，按与 ANT 的相似度加权</div>
+    <div class="ver">参考了 <span id="nsamp"></span> 只美国科技新股上市后的真实走势<br><span id="built"></span></div>
   </header>
 
   <dl class="strip">
@@ -201,8 +203,10 @@ td.h{transition:background-color .25s}
     <div><dt>募资（亿美元）</dt><dd>578–644</dd></div>
     <div><dt>认购倍数</dt><dd>约 6 倍</dd></div>
     <div><dt>总股数</dt><dd>130.9 亿</dd></div>
-    <div><dt>10 年美债</dt><dd>5.15%</dd></div>
+    <div><dt>公司估值</dt><dd>约 1 万亿美元</dd></div>
   </dl>
+
+  <p class="how">怎么用：<b>① 改数字</b>　<b>② 拖滑杆</b>　<b>③ 看下面的变化</b></p>
 
   <section class="panel">
     <div class="ph"><h2>ANT 是什么</h2><p>数字来自招股书</p></div>
@@ -218,16 +222,16 @@ td.h{transition:background-color .25s}
   </section>
 
   <section class="panel">
-    <div class="ph"><h2><small>STEP 1</small>开盘前：开盘价会落在哪</h2><p>历史定价规律与市场盘口，按各自误差大小加权</p></div>
+    <div class="ph"><h2><small>第一步</small>开盘价会是多少</h2><p>历史定价规律与市场盘口，按各自误差大小加权</p></div>
     <div class="pb"><p class="say" id="say1"></p></div>
     <div class="pb two" style="padding-top:0">
       <div>
         <div class="ctl">
-          <label class="f">发行价<span class="box"><i>$</i><input type="number" id="offer" value="78" step="1" min="40" inputmode="decimal"></span></label>
-          <label class="f">定价方式<span class="box"><select id="above"><option value="0">区间内定价</option><option value="1">直接高于区间</option></select></span></label>
-          <label class="f">场外合约价<span class="box"><i>$</i><input type="number" id="perp" value="99.4" step="0.5" inputmode="decimal"></span></label>
-          <label class="f">预测市场收盘价<span class="box"><i>$</i><input type="number" id="pm" value="106.5" step="0.5" inputmode="decimal"></span></label>
-          <label class="f">你的限价<span class="box"><i>$</i><input type="number" id="limit" value="105" step="1" inputmode="decimal"></span></label>
+          <label class="f">发行价<span class="box"><i>$</i><input type="number" id="offer" value="78" step="1" min="40" inputmode="decimal"></span><small>公司卖给机构的价</small></label>
+          <label class="f">定价方式<span class="box"><select id="above"><option value="0">区间内定价</option><option value="1">直接高于区间</option></select></span><small>最终价在不在区间内</small></label>
+          <label class="f">场外押注价<span class="box"><i>$</i><input type="number" id="perp" value="99.4" step="0.5" inputmode="decimal"></span><small>上市前市场押的价</small></label>
+          <label class="f">首日收盘押注价<span class="box"><i>$</i><input type="number" id="pm" value="106.5" step="0.5" inputmode="decimal"></span><small>预测网站押的首日收盘</small></label>
+          <label class="f">你的限价<span class="box"><i>$</i><input type="number" id="limit" value="105" step="1" inputmode="decimal"></span><small>你最多愿意付的价</small></label>
         </div>
         <dl class="stats" id="openStats"></dl>
       </div>
@@ -239,7 +243,7 @@ td.h{transition:background-color .25s}
   </section>
 
   <section class="panel">
-    <div class="ph"><h2><small>STEP 2</small>开盘后：填入开盘价，看后面的区间</h2><p>拖动滑杆，下面所有数字实时变化</p></div>
+    <div class="ph"><h2><small>第二步</small>买进之后，价格会怎么走</h2><p>拖动滑杆，下面所有数字实时变化</p></div>
     <div class="pb">
       <p class="say" id="say2"></p>
       <div class="slider">
@@ -251,25 +255,25 @@ td.h{transition:background-color .25s}
         <div class="scale" id="scale"></div>
       </div>
       <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:14px">
-        <div class="f" style="font-size:13px;color:var(--ink2)">每天收盘价的可能范围</div>
+        <div class="f" style="font-size:13px;color:var(--ink2);white-space:normal">每天收盘价可能在哪（蓝色越深越可能）</div>
         <div class="seg" id="hz"><button type="button" data-v="10" aria-pressed="false">前 10 天</button><button type="button" data-v="27" aria-pressed="true">到 12 月底</button><button type="button" data-v="126" aria-pressed="false">半年</button></div>
       </div>
       <div class="chart"><svg id="fan" viewBox="0 0 1100 420" role="img" aria-label="价格区间扇形图"></svg></div>
       <div class="legend"><span><i style="background:var(--fan2)"></i>一半的情况落在这里</span><span><i style="background:var(--fan1)"></i>八成的情况落在这里</span><span><i class="l" style="border-color:var(--fan);border-top-style:solid"></i>中位数</span><span><i class="l" style="border-color:var(--up)"></i>止盈线</span><span><i class="l" style="border-color:var(--down)"></i>下跌参考线</span><span><i class="l" style="border-color:var(--muted)"></i>发行价</span></div>
 
-      <div style="margin-top:22px;white-space:normal" class="f"><span style="font-size:13px;color:var(--ink2);line-height:1.5">期间最高价、最低价会到哪（粗条 = 一半的可能，细条 = 八成的可能，竖线 = 中位数，虚线 = 发行价）</span></div>
+      <div style="margin-top:22px;white-space:normal" class="f"><span style="font-size:13px;color:var(--ink2);line-height:1.5">这段时间里最高、最低会到哪（粗条最可能，白线是正中，虚线是发行价）</span></div>
       <div class="ranges" id="ranges"></div>
     </div>
   </section>
 
   <section class="panel">
-    <div class="ph"><h2>交易规则情景：头两个交易日</h2><p>改动参数，看四种结果各占多少</p></div>
+    <div class="ph"><h2>头两天会有四种结果</h2><p>改数字，看每种结果的可能性</p></div>
     <div class="pb">
       <p class="say" id="say3"></p>
       <div class="ctl c3" style="max-width:520px">
-        <label class="f">投入金额<span class="box"><i>$</i><input type="number" id="stake" value="10000" step="1000" inputmode="numeric"></span></label>
-        <label class="f">止盈线<span class="box"><input type="number" id="tp" value="40" step="5" inputmode="numeric"><i>%</i></span></label>
-        <label class="f">小亏线<span class="box"><input type="number" id="sl" value="10" step="1" inputmode="numeric"><i>%</i></span></label>
+        <label class="f">投入金额<span class="box"><i>$</i><input type="number" id="stake" value="100000" step="1000" inputmode="numeric"></span><small>打算买多少钱</small></label>
+        <label class="f">止盈线<span class="box"><input type="number" id="tp" value="40" step="5" inputmode="numeric"><i>%</i></span><small>涨到这就卖</small></label>
+        <label class="f">小亏线<span class="box"><input type="number" id="sl" value="10" step="1" inputmode="numeric"><i>%</i></span><small>亏在这以内不动</small></label>
       </div>
       <div class="scroll desk" style="margin-top:14px"><table id="ruleTbl"></table></div><div class="rcards" id="ruleCards"></div>
       <p class="note" id="ruleNote"></p>
@@ -277,17 +281,17 @@ td.h{transition:background-color .25s}
   </section>
 
   <section class="panel">
-    <div class="ph"><h2>价位地图：每个价位在几天内被碰到的概率</h2><p>颜色越深，概率越高；按上面的开盘价计算</p></div>
-    <div class="pb"><p class="say">怎么看：每一行是一个价位，每一格是"这段时间里，价格到过这个位置"的可能性。红色是往上涨到，绿色是往下跌到，颜色越深越可能。数字都是历史上类似新股的发生频率，误差大约正负 15 个百分点。</p><div class="scroll"><table id="mapTbl"></table></div></div>
+    <div class="ph"><h2>价位地图：价格到过每个位置的可能性</h2><p>颜色越深，概率越高；按上面的开盘价计算</p></div>
+    <div class="pb"><p class="say">怎么看：每行一个价位，每格是这段时间里到过这个价的可能性。红色是涨到，绿色是跌到，越深越可能。</p><div class="scroll"><table id="mapTbl"></table></div></div>
   </section>
 
   <section class="panel">
-    <div class="ph"><h2>可比样本：权重最高的 12 只</h2><p>涨跌幅均相对各自的首日开盘价</p></div>
+    <div class="ph"><h2>和 ANT 最像的 12 只新股</h2><p>它们上市后各自怎么走的</p></div>
     <div class="pb"><div class="scroll"><table id="simTbl"></table></div></div>
   </section>
 
   <section class="panel">
-    <div class="ph"><h2>数据与方法</h2><p>每个数字的出处</p></div>
+    <div class="ph"><h2>这些数字从哪来</h2><p>数据和算法</p></div>
     <div class="pb">
       <dl class="src">
         <div><dt>发行条款</dt><dd>美国证监会 EDGAR：Anthropic S-1/A 招股书（2026-11-10）与上市材料 FWP（2026-11-12）。发行区间、股数、解禁时间表均取自原文。</dd></div>
@@ -303,7 +307,7 @@ td.h{transition:background-color .25s}
     </div>
   </section>
 
-  <p class="foot">模型输出为概率预测，不构成投资建议。百分比均相对首日开盘价；"碰到"指盘中最高价或最低价到过该价位。</p>
+  <p class="foot">这些都是按历史算出来的可能性，不是保证，也不构成投资建议。百分比都是和开盘价比。</p>
 </div>
 <div id="tip" hidden></div>
 
@@ -331,7 +335,7 @@ function renderOpen(m){const L=val('limit');
    `<div><dt>一半的可能落在</dt><dd>${usd(m.q(Z.p25))} – ${usd(m.q(Z.p75))}</dd></div>`+
    `<div><dt>八成的可能落在</dt><dd>${usd(m.q(Z.p10))} – ${usd(m.q(Z.p90))}</dd></div>`+
    `<div><dt>限价 ${usd(L)} 能成交的概率</dt><dd>${fmt(m.fill(L)*100)}%</dd></div>`+
-   `<div><dt>历史规律 / 市场盘口</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}<em>权重 ${fmt(m.wH*100)} : ${fmt((1-m.wH)*100)}</em></dd></div>`;
+   `<div><dt>按历史算 / 按市场押注算</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}<em>权重 ${fmt(m.wH*100)} : ${fmt((1-m.wH)*100)}</em></dd></div>`;
   // 密度图
   const cwD=$('dens').clientWidth||620,narrow=cwD<460,W=narrow?Math.max(280,Math.round(cwD)):620,H=narrow?220:250,ml=16,mr=16,mt=30,mb=42,pw=W-ml-mr,ph=H-mt-mb,x0=m.q(-2.6),x1=m.q(2.6);$('dens').setAttribute('viewBox',`0 0 ${W} ${H}`);
   const X=v=>ml+pw*(Math.log(v)-Math.log(x0))/(Math.log(x1)-Math.log(x0)),pdf=v=>Math.exp(-(((Math.log(v)-m.mu)/m.sd)**2)/2);
@@ -404,13 +408,14 @@ function renderMap(){const open=val('open'),offer=val('offer');
     for(const n of [1,2,5,27,126]){const p=prob(x=>dir==='涨到'?x['hi'+n]>=r:x['lo'+n]<=r);h+=`<td class="h" style="--hc:color-mix(in srgb,var(${col}) ${Math.round(8+p*62)}%,transparent)">${fmt(p*100)}%</td>`}
     h+='</tr>'}
   $('mapTbl').innerHTML=h}
+const NM={"SPCX": "SpaceX", "ARM": "Arm", "SNOW": "Snowflake", "FIG": "Figma", "PLTR": "Palantir", "CRWV": "CoreWeave", "RIVN": "Rivian", "RBLX": "Roblox", "COIN": "Coinbase", "ABNB": "爱彼迎", "CPNG": "Coupang", "UBER": "优步", "META": "Facebook", "DASH": "DoorDash", "HOOD": "Robinhood", "CRCL": "Circle", "RDDT": "Reddit", "KLAR": "Klarna", "AI": "C3.ai", "U": "Unity", "TSLA": "特斯拉", "ALAB": "Astera Labs", "TEM": "Tempus AI", "MBLY": "Mobileye", "PATH": "UiPath", "LYFT": "Lyft", "ZM": "Zoom", "PINS": "Pinterest", "SNAP": "Snap", "CRWD": "CrowdStrike"};
 function renderSim(){const t=N.slice().sort((a,b)=>b.w-a.w).slice(0,12),c=v=>v==null?'<td class="n">—</td>':`<td class="n ${cls(v)}">${pct(v)}</td>`;
-  $('simTbl').innerHTML='<tr><th>代码</th><th>权重</th><th>头两天最高</th><th>头两天最低</th><th>第 2 天收盘</th><th>第 27 天收盘</th><th>半年内最低</th><th>第 126 天收盘</th></tr>'+t.map(n=>`<tr><td class="num">${n.s}</td><td class="n">${fmt(n.w*100,1)}%</td>${c(n.hi2)}${c(n.lo2)}${c(n.c2)}${c(n.c27)}${c(n.lo126)}${c(n.c126)}</tr>`).join('')}
+  $('simTbl').innerHTML='<tr><th>公司</th><th>相似度占比</th><th>头两天最高</th><th>头两天最低</th><th>第 2 天收盘</th><th>第 27 天收盘</th><th>半年内最低</th><th>第 126 天收盘</th></tr>'+t.map(n=>`<tr><td>${NM[n.s]||n.s}</td><td class="n">${fmt(n.w*100,1)}%</td>${c(n.hi2)}${c(n.lo2)}${c(n.c2)}${c(n.c27)}${c(n.lo126)}${c(n.c126)}</tr>`).join('')}
 
 function say(id,html){const e=$(id);if(e.innerHTML===html)return;e.innerHTML=html;if(e.classList){e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash')}}
 function chance(p){return p>=.85?'基本都能':p>=.65?'多半能':p>=.45?'一半一半':p>=.25?'多半不能':'很难'}
 function saySteps(m){const L=val('limit'),open=val('open'),offer=m.offer,prem=open/offer-1,f=m.fill(L);
-  say('say1',`大白话：按现在的信息，开盘价最可能在 <b>${usd(m.q(0))}</b> 上下，有一半的可能落在 <b>${usd(m.q(Z.p25))}–${usd(m.q(Z.p75))}</b>。你把限价挂在 <b>${usd(L)}</b>，${chance(f)}买到（大约 10 次里 ${Math.round(f*10)} 次）。限价是你最多愿意付的价，实际按开盘价成交；开盘价比限价高就买不到。`);
+  say('say1',`大白话：按现在的信息，开盘价最可能在 <b>${usd(m.q(0))}</b> 上下，有一半的可能落在 <b>${usd(m.q(Z.p25))}–${usd(m.q(Z.p75))}</b>。你把限价挂在 <b>${usd(L)}</b>，${chance(f)}买到（大约 10 次里 ${Math.round(f*10)} 次）。开盘价比限价高就买不到。`);
   const grp=prem<0?'开在发行价下面，这种情况很少见，说明市场很冷':prem<.2?'开盘只比发行价高一点。历史上这一档的 9 只新股，半年内全部跌回过发行价':prem<.5?'开盘比发行价高两到五成。历史上这一档的新股，半年内约有一半跌回过发行价':'开盘比发行价高五成以上。历史上这一档的新股，跌回发行价的约三成，但开盘后再往上的空间也最小';
   const z=(k,q)=>usd(open*(1+wq(k,q)));
   say('say2',`大白话：假如开在 <b>${usd(open,1)}</b>（比发行价 ${pct(prem)}），${grp}。头两天，最高价多半在 <b>${z('hi2',.25)}–${z('hi2',.75)}</b>，最低价多半在 <b>${z('lo2',.25)}–${z('lo2',.75)}</b>；到 12 月底，最低价多半在 <b>${z('lo27',.25)}–${z('lo27',.75)}</b>。`);
