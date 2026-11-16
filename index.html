@@ -116,6 +116,13 @@ tr:last-child td{border-bottom:0}
 .pbar i b{display:block;height:100%;background:var(--accent);border-radius:3px}
 td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;font-weight:600;background:var(--hc,transparent);border-left:2px solid var(--panel)}
 .pos{color:var(--up)}.neg{color:var(--down)}
+
+.rcards{display:none}.mp{display:none}
+.rc{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel2)}
+.rt{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px}.rt b{font-size:24px;font-weight:700;color:var(--accent)}
+.rb{height:5px;border-radius:3px;background:var(--line);margin:8px 0 10px;overflow:hidden}.rb i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.rr{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--muted)}.rr b{font-size:15px;font-weight:600}
+.ra{margin-top:8px;font-size:12.5px;color:var(--ink2)}
 .note{color:var(--muted);font-size:12.5px;margin:12px 0 0}
 .src{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 28px}
 .src div{padding:10px 0;border-bottom:1px dashed var(--line)}
@@ -146,6 +153,11 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
   th,td{padding:8px 7px;font-size:12.5px}td.h{font-size:14px}
   th{font-size:10.5px;letter-spacing:0}
   .src{grid-template-columns:minmax(0,1fr)}
+  .desk{display:none}.rcards{display:grid;gap:10px;margin-top:12px}
+  .ctl.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #mapTbl .c2,#mapTbl .dk{display:none}.mp{display:block;font-style:normal;font-size:11px;color:var(--muted);font-family:var(--mono)}
+  #mapTbl th,#mapTbl td{padding:9px 4px;text-align:center}#mapTbl th:first-child,#mapTbl td:first-child{text-align:left;padding-left:2px;white-space:nowrap}
+  #mapTbl td.h{font-size:14.5px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -206,7 +218,7 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
       <div class="chart"><svg id="fan" viewBox="0 0 1100 420" role="img" aria-label="价格区间扇形图"></svg></div>
       <div class="legend"><span><i style="background:var(--fan2)"></i>一半的情况落在这里</span><span><i style="background:var(--fan1)"></i>八成的情况落在这里</span><span><i class="l" style="border-color:var(--fan);border-top-style:solid"></i>中位数</span><span><i class="l" style="border-color:var(--up)"></i>止盈线</span><span><i class="l" style="border-color:var(--down)"></i>下跌参考线</span><span><i class="l" style="border-color:var(--muted)"></i>发行价</span></div>
 
-      <div style="margin-top:22px" class="f"><span style="font-size:13px;color:var(--ink2)">期间最高价、最低价会到哪（粗条 = 一半的可能，细条 = 八成的可能，竖线 = 中位数，虚线 = 发行价）</span></div>
+      <div style="margin-top:22px;white-space:normal" class="f"><span style="font-size:13px;color:var(--ink2);line-height:1.5">期间最高价、最低价会到哪（粗条 = 一半的可能，细条 = 八成的可能，竖线 = 中位数，虚线 = 发行价）</span></div>
       <div class="ranges" id="ranges"></div>
     </div>
   </section>
@@ -214,12 +226,12 @@ td.h{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:15px;fo
   <section class="panel">
     <div class="ph"><h2>交易规则情景：头两个交易日</h2><p>改动参数，看四种结果各占多少</p></div>
     <div class="pb">
-      <div class="ctl" style="max-width:520px">
+      <div class="ctl c3" style="max-width:520px">
         <label class="f">投入金额<span class="box"><i>$</i><input type="number" id="stake" value="10000" step="1000" inputmode="numeric"></span></label>
         <label class="f">止盈线<span class="box"><input type="number" id="tp" value="40" step="5" inputmode="numeric"><i>%</i></span></label>
         <label class="f">小亏线<span class="box"><input type="number" id="sl" value="10" step="1" inputmode="numeric"><i>%</i></span></label>
       </div>
-      <div class="scroll" style="margin-top:14px"><table id="ruleTbl"></table></div>
+      <div class="scroll desk" style="margin-top:14px"><table id="ruleTbl"></table></div><div class="rcards" id="ruleCards"></div>
       <p class="note" id="ruleNote"></p>
     </div>
   </section>
@@ -281,7 +293,7 @@ function renderOpen(m){const L=val('limit');
    `<div><dt>限价 ${usd(L)} 能成交的概率</dt><dd>${fmt(m.fill(L)*100)}%</dd></div>`+
    `<div><dt>历史规律 / 市场盘口</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}<em>权重 ${fmt(m.wH*100)} : ${fmt((1-m.wH)*100)}</em></dd></div>`;
   // 密度图
-  const narrow=($('dens').clientWidth||620)<460,W=narrow?400:620,H=narrow?230:250,ml=16,mr=16,mt=30,mb=42,pw=W-ml-mr,ph=H-mt-mb,x0=m.q(-2.6),x1=m.q(2.6);$('dens').setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const cwD=$('dens').clientWidth||620,narrow=cwD<460,W=narrow?Math.max(280,Math.round(cwD)):620,H=narrow?220:250,ml=16,mr=16,mt=30,mb=42,pw=W-ml-mr,ph=H-mt-mb,x0=m.q(-2.6),x1=m.q(2.6);$('dens').setAttribute('viewBox',`0 0 ${W} ${H}`);
   const X=v=>ml+pw*(Math.log(v)-Math.log(x0))/(Math.log(x1)-Math.log(x0)),pdf=v=>Math.exp(-(((Math.log(v)-m.mu)/m.sd)**2)/2);
   const Y=p=>mt+ph*(1-p),pts=[];for(let i=0;i<=120;i++){const v=Math.exp(Math.log(x0)+(Math.log(x1)-Math.log(x0))*i/120);pts.push([X(v),Y(pdf(v)),v])}
   const area=(a,b)=>{const s=pts.filter(p=>p[2]>=a&&p[2]<=b);if(s.length<2)return'';return 'M'+X(a).toFixed(1)+','+Y(0)+' L'+X(a).toFixed(1)+','+Y(pdf(a)).toFixed(1)+s.map(p=>' L'+p[0].toFixed(1)+','+p[1].toFixed(1)).join('')+' L'+X(b).toFixed(1)+','+Y(pdf(b)).toFixed(1)+' L'+X(b).toFixed(1)+','+Y(0)+'Z'};
@@ -301,22 +313,22 @@ function setOpenRange(m){const el=$('open'),lo=Math.floor(m.offer*.8),hi=Math.ce
   $('scale').innerHTML=`<span style="--x:${P(m.offer)}">发行价<br>${usd(m.offer)}</span>`+(gap?`<span class="a" style="--x:${P(m.q(0))}">预测中位<br>${usd(m.q(0))}</span>`:'')+`<span style="--x:${P(lo+(hi-lo)*.97)}">${usd(hi)}</span>`}
 function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('tp')/100,sl=val('sl')/100;
   $('openBig').textContent=usd(open,1);$('openPrem').textContent='较发行价 '+pct(open/offer-1);
-  const narrow=($('fan').clientWidth||1100)<640,Wd=narrow?560:1100,Hd=narrow?400:420,ml=narrow?46:62,mr=narrow?112:150,mt=16,mb=36,pw=Wd-ml-mr,ph=Hd-mt-mb;$('fan').setAttribute('viewBox',`0 0 ${Wd} ${Hd}`);
+  const cwF=$('fan').clientWidth||1100,narrow=cwF<640,Wd=narrow?Math.max(300,Math.round(cwF)):1100,Hd=narrow?330:420,ml=narrow?38:62,mr=narrow?86:150,mt=16,mb=34,pw=Wd-ml-mr,ph=Hd-mt-mb;$('fan').setAttribute('viewBox',`0 0 ${Wd} ${Hd}`);
   const idx=F.d.map((d,i)=>i).filter(i=>F.d[i]<=hz),G=k=>idx.map(i=>open*(1+F[k][i]));
-  const refs=[['止盈 '+pct(tp),open*(1+tp),'var(--up)'],['买入价',open,'var(--ink2)'],['小亏线 '+pct(-sl),open*(1-sl),'var(--down)'],['−20%',open*.8,'var(--down)'],['−40%',open*.6,'var(--down)'],['发行价',offer,'var(--muted)']];
+  const refs=[[narrow?'止盈':'止盈 '+pct(tp),open*(1+tp),'var(--up)'],['买入价',open,'var(--ink2)'],[narrow?'小亏线':'小亏线 '+pct(-sl),open*(1-sl),'var(--down)'],['−20%',open*.8,'var(--down)'],['−40%',open*.6,'var(--down)'],['发行价',offer,'var(--muted)']];
   const lo=Math.min(...G('p10'),open*.57,offer*.96),hi=Math.max(...G('p90'),open*(1+tp)*1.06);
   const y=v=>mt+ph*(1-(Math.log(v)-Math.log(lo))/(Math.log(hi)-Math.log(lo))),x=i=>ml+pw*(F.d[i]-1)/Math.max(1,hz-1);
   const path=k=>idx.map((i,j)=>(j?'L':'M')+x(i).toFixed(1)+','+y(open*(1+F[k][i])).toFixed(1)).join('');
   const band=(a,b)=>path(a)+idx.slice().reverse().map(i=>'L'+x(i).toFixed(1)+','+y(open*(1+F[b][i])).toFixed(1)).join('')+'Z';
   const stepRaw=(hi-lo)/6,mag=Math.pow(10,Math.floor(Math.log10(stepRaw))),step=[1,2,2.5,5,10].map(k=>k*mag).find(k=>k>=stepRaw)||stepRaw;
-  let s='';for(let t=Math.ceil(lo/step)*step;t<=hi;t+=step)s+=`<line x1="${ml}" x2="${ml+pw}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${ml-10}" y="${y(t)+4}" text-anchor="end" font-size="12" font-family="var(--mono)" fill="var(--muted)">${usd(t)}</text>`;
+  let s='';for(let t=Math.ceil(lo/step)*step;t<=hi;t+=step)s+=`<line x1="${ml}" x2="${ml+pw}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)"/><text x="${ml-(narrow?6:10)}" y="${y(t)+4}" text-anchor="end" font-size="${narrow?11:12}" font-family="var(--mono)" fill="var(--muted)">${usd(t)}</text>`;
   const xt=narrow?(hz<=10?[1,3,5,7,10]:hz<=27?[1,10,20,27]:[1,48,76,126]):(hz<=10?[1,2,3,5,7,10]:hz<=27?[1,5,10,15,20,27]:[1,27,48,62,76,100,126]);
   for(const d of xt){const i=F.d.indexOf(d);s+=`<text x="${x(i)}" y="${Hd-12}" text-anchor="${d===1?'start':'middle'}" font-size="12" fill="var(--muted)">第 ${d} 天</text>`}
   s+=`<path d="${band('p10','p90')}" fill="var(--fan1)"/><path d="${band('p25','p75')}" fill="var(--fan2)"/><path d="${path('p50')}" fill="none" stroke="var(--fan)" stroke-width="2.4" stroke-linejoin="round"/>`;
   const used=[];refs.sort((a,b)=>b[1]-a[1]);
   for(const [lab,v,col] of refs){if(v<lo||v>hi)continue;const yy=y(v);s+=`<line x1="${ml}" x2="${ml+pw}" y1="${yy}" y2="${yy}" stroke="${col}" stroke-width="1.3" stroke-dasharray="${lab==='买入价'?'1 5':'6 5'}"/>`;
     let ty=yy+4;for(const u of used)if(Math.abs(ty-u)<15)ty=u+15;used.push(ty);
-    s+=`<text x="${ml+pw+10}" y="${ty}" font-size="12" fill="${col}">${lab}</text><text x="${Wd-4}" y="${ty}" text-anchor="end" font-size="12" font-family="var(--mono)" fill="var(--ink)">${usd(v)}</text>`}
+    s+=`<text x="${ml+pw+(narrow?6:10)}" y="${ty}" font-size="${narrow?11:12}" fill="${col}">${lab}</text><text x="${Wd-4}" y="${ty}" text-anchor="end" font-size="12" font-family="var(--mono)" fill="var(--ink)">${usd(v)}</text>`}
   s+=`<line id="cur" y1="${mt}" y2="${mt+ph}" stroke="var(--ink2)" stroke-width="1" visibility="hidden"/><circle id="dot" r="4.5" fill="var(--fan)" stroke="var(--panel)" stroke-width="2" visibility="hidden"/><rect id="hit" x="${ml}" y="${mt}" width="${pw}" height="${ph}" fill="transparent" style="touch-action:pan-y"/>`;
   const svg=$('fan');svg.innerHTML=s;const tip=$('tip'),cur=$('cur'),dot=$('dot'),hit=$('hit');
   hit.onpointermove=e=>{const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*Wd;let d=Math.round(1+(px-ml)/pw*(hz-1));d=Math.max(1,Math.min(hz,d));const i=F.d.indexOf(d);
@@ -336,14 +348,15 @@ function renderRules(){const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/10
   for(const [lab,f,avg,act,first] of rows){const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);
     h+=`<tr><td>${lab}</td><td><span class="pbar"><span class="num">${fmt(p*100)}%</span><i><b style="width:${Math.min(100,p*100)}%"></b></i></span></td><td class="n ${cls(a)}">${pct(a)}</td><td class="n ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</td><td class="n ${first?'':cls(m27)}">${first?'—':pct(m27)}</td><td class="t">${act}</td></tr>`}
   $('ruleTbl').innerHTML=h;
+  $('ruleCards').innerHTML=rows.map(([lab,f,avg,act,first])=>{const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);return `<div class="rc"><div class="rt"><span>${lab}</span><b class="num">${fmt(p*100)}%</b></div><div class="rb"><i style="width:${Math.min(100,p*100)}%"></i></div><div class="rr"><span>平均 <b class="num ${cls(a)}">${pct(a)}</b></span><span>约 <b class="num ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</b></span><span>${first?'':'到 12 月底 <b class="num '+cls(m27)+'">'+pct(m27)+'</b>'}</span></div><div class="ra">${act}</div></div>`}).join('');
   const g=fn=>fmt(prob(fn)*100)+'%';
   $('ruleNote').textContent=`同一条止盈线：5 天内碰到的概率 ${g(n=>n.hi5>=tp)}，到 12 月底 ${g(n=>n.hi27>=tp)}，半年内 ${g(n=>n.hi126>=tp)}。到 12 月底比买入价跌 20% 的概率 ${g(n=>n.lo27<=-.2)}，半年内跌 40% 的概率 ${g(n=>n.lo126<=-.4)}。`}
 function renderMap(){const open=val('open'),offer=val('offer');
   const up=[1,.75,.5,.4,.3,.2,.1].map(r=>[open*(1+r),'涨到']),dn=[-.05,-.1,-.15,-.2,-.3,-.4].map(r=>[open*(1+r),'跌到']);
   if(offer<open*.985&&offer>open*.55)dn.push([offer,'跌到']);dn.sort((a,b)=>b[0]-a[0]);
-  let h='<tr><th>价位</th><th>相对买入价</th><th>1 天内</th><th>2 天内</th><th>5 天内</th><th>到 12 月底</th><th>半年内</th></tr>';
+  let h='<tr><th>价位</th><th class="c2">相对买入价</th><th>1 天</th><th>2 天</th><th>5 天</th><th>12 月底</th><th>半年</th></tr>';
   for(const [v,dir] of up.concat(dn)){const r=v/open-1,isOffer=Math.abs(v-offer)<.005,col=dir==='涨到'?'--up':'--down';
-    h+=`<tr><td><span style="color:var(${col})">${dir}</span> <span class="num">${usd(v,v<100?1:0)}</span>${isOffer?'　发行价':''}</td><td class="n">${pct(r)}</td>`;
+    h+=`<tr><td><span style="color:var(${col})">${dir}</span> <span class="num">${usd(v,v<100?1:0)}</span><em class="mp">${isOffer?'发行价 ':''}${pct(r)}</em>${isOffer?'<span class="dk">　发行价</span>':''}</td><td class="n c2">${pct(r)}</td>`;
     for(const n of [1,2,5,27,126]){const p=prob(x=>dir==='涨到'?x['hi'+n]>=r:x['lo'+n]<=r);h+=`<td class="h" style="--hc:color-mix(in srgb,var(${col}) ${Math.round(8+p*62)}%,transparent)">${fmt(p*100)}%</td>`}
     h+='</tr>'}
   $('mapTbl').innerHTML=h}
