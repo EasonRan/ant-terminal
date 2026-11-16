@@ -237,7 +237,7 @@ td.h{transition:background-color .25s}
       </div>
       <div>
         <div class="chart"><svg id="dens" viewBox="0 0 620 250" role="img" aria-label="开盘价概率分布"></svg></div>
-        <p class="note" style="margin:6px 0 8px">怎么看：横着是开盘价，山越高的地方越可能开在那里。深色那块占一半的可能，加上两边浅色共占八成；再往外两头各只剩一成。</p><div class="legend"><span><i style="background:var(--accent-mid)"></i>一半的可能落在这段</span><span><i style="background:var(--accent-soft)"></i>八成的可能落在这段</span><span><i class="l" style="border-color:var(--muted)"></i>发行价</span><span><i class="l" style="border-color:var(--ink)"></i>你的限价</span></div>
+        <p class="note" style="margin:6px 0 8px">怎么看：山越高的地方，越可能开在那个价。</p><div class="legend"><span><i style="background:var(--accent-mid)"></i>一半的可能落在这段</span><span><i style="background:var(--accent-soft)"></i>八成的可能落在这段</span><span><i class="l" style="border-color:var(--muted)"></i>发行价</span><span><i class="l" style="border-color:var(--ink)"></i>你的限价</span></div>
       </div>
     </div>
   </section>
@@ -249,7 +249,7 @@ td.h{transition:background-color .25s}
       <div class="slider">
         <div class="top">
           <div><div class="f" style="margin-bottom:4px">开盘价 / 你的买入价</div><div class="big"><b class="num" id="openBig">$95.0</b><span id="openPrem">+22%</span></div></div>
-          <div class="btns"><button type="button" id="b25">偏低情形</button><button type="button" id="b50">预测中位数</button><button type="button" id="b75">偏高情形</button></div>
+          <div class="btns"><button type="button" id="b25">开得低</button><button type="button" id="b50">最可能</button><button type="button" id="b75">开得高</button></div>
         </div>
         <div class="track hint" id="track"><div class="rail"></div><div class="band"></div><div class="mk" id="mkOffer"></div><div class="mk med" id="mkMed"></div><input type="range" id="open" min="60" max="170" step="0.5" value="95" aria-label="开盘价"></div>
         <div class="scale" id="scale"></div>
@@ -331,11 +331,11 @@ function openModel(){const offer=Math.max(1,val('offer')),ratio=$('above').value
   return {offer,mu,sd,q:z=>Math.exp(mu+sd*z),fill:L=>ncdf((Math.log(Math.max(1,L))-mu)/sd),wH:wH/(wH+wM),hist:offer*ratio,mkt:Math.exp(muM)}}
 function renderOpen(m){const L=val('limit');
   $('openStats').innerHTML=
-   `<div class="hero"><dt>开盘价中位数</dt><dd>${usd(m.q(0))}<em>比发行价 ${pct(m.q(0)/m.offer-1)}</em></dd></div>`+
+   `<div class="hero"><dt>最可能的开盘价</dt><dd>${usd(m.q(0))}<em>比发行价 ${pct(m.q(0)/m.offer-1)}</em></dd></div>`+
    `<div><dt>一半的可能落在</dt><dd>${usd(m.q(Z.p25))} – ${usd(m.q(Z.p75))}</dd></div>`+
    `<div><dt>八成的可能落在</dt><dd>${usd(m.q(Z.p10))} – ${usd(m.q(Z.p90))}</dd></div>`+
-   `<div><dt>限价 ${usd(L)} 能成交的概率</dt><dd>${fmt(m.fill(L)*100)}%</dd></div>`+
-   `<div><dt>按历史算 / 按市场押注算</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}<em>权重 ${fmt(m.wH*100)} : ${fmt((1-m.wH)*100)}</em></dd></div>`;
+   `<div><dt>限价 ${usd(L)} 能买到的可能</dt><dd>${fmt(m.fill(L)*100)}%</dd></div>`+
+   `<div><dt>按历史算 / 按市场押注算</dt><dd>${usd(m.hist)} / ${usd(m.mkt)}</dd></div>`;
   // 密度图
   const cwD=$('dens').clientWidth||620,narrow=cwD<460,W=narrow?Math.max(280,Math.round(cwD)):620,H=narrow?220:250,ml=16,mr=16,mt=30,mb=42,pw=W-ml-mr,ph=H-mt-mb,x0=m.q(-2.6),x1=m.q(2.6);$('dens').setAttribute('viewBox',`0 0 ${W} ${H}`);
   const X=v=>ml+pw*(Math.log(v)-Math.log(x0))/(Math.log(x1)-Math.log(x0)),pdf=v=>Math.exp(-(((Math.log(v)-m.mu)/m.sd)**2)/2);
@@ -354,7 +354,7 @@ function setOpenRange(m){const el=$('open'),lo=Math.floor(m.offer*.8),hi=Math.ce
   t.style.setProperty('--b0',P(m.q(Z.p25)));t.style.setProperty('--bw',((m.q(Z.p75)-m.q(Z.p25))/(hi-lo)*100).toFixed(2)+'%');
   $('mkOffer').style.setProperty('--x',P(m.offer));$('mkMed').style.setProperty('--x',P(m.q(0)));
   const gap=Math.abs(m.q(0)-m.offer)/(hi-lo)>.09;
-  $('scale').innerHTML=`<span style="--x:${P(m.offer)}">发行价<br>${usd(m.offer)}</span>`+(gap?`<span class="a" style="--x:${P(m.q(0))}">预测中位<br>${usd(m.q(0))}</span>`:'')+`<span style="--x:${P(lo+(hi-lo)*.97)}">${usd(hi)}</span>`}
+  $('scale').innerHTML=`<span style="--x:${P(m.offer)}">发行价<br>${usd(m.offer)}</span>`+(gap?`<span class="a" style="--x:${P(m.q(0))}">最可能<br>${usd(m.q(0))}</span>`:'')+`<span style="--x:${P(lo+(hi-lo)*.97)}">${usd(hi)}</span>`}
 function renderFan(){const open=val('open'),offer=val('offer'),hz=S.hz,tp=val('tp')/100,sl=val('sl')/100;
   $('openBig').textContent=usd(open,1);$('openPrem').textContent='较发行价 '+pct(open/offer-1);
   const cwF=$('fan').clientWidth||1100,narrow=cwF<640,Wd=narrow?Math.max(300,Math.round(cwF)):1100,Hd=narrow?330:420,ml=narrow?38:62,mr=narrow?86:150,mt=16,mb=34,pw=Wd-ml-mr,ph=Hd-mt-mb;$('fan').setAttribute('viewBox',`0 0 ${Wd} ${Hd}`);
@@ -398,7 +398,7 @@ function renderRules(){const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/10
   $('ruleTbl').innerHTML=h;
   $('ruleCards').innerHTML=rows.map(([lab,f,avg,act,first])=>{const p=prob(n=>n.c2==null?null:f(n)),a=avg(),m27=wq('c27',.5,f);return `<div class="rc"><div class="rt"><span>${lab}</span><b class="num">${fmt(p*100)}%</b></div><div class="rb"><i style="width:${Math.min(100,p*100)}%"></i></div><div class="rr"><span>平均 <b class="num ${cls(a)}">${pct(a)}</b></span><span>约 <b class="num ${cls(a)}">${a>=0?'+':'−'}${usd(Math.abs(stake*a))}</b></span><span>${first?'':'到 12 月底 <b class="num '+cls(m27)+'">'+pct(m27)+'</b>'}</span></div><div class="ra">${act}</div></div>`}).join('');
   const g=fn=>fmt(prob(fn)*100)+'%';
-  $('ruleNote').textContent=`同一条止盈线：5 天内碰到的概率 ${g(n=>n.hi5>=tp)}，到 12 月底 ${g(n=>n.hi27>=tp)}，半年内 ${g(n=>n.hi126>=tp)}。到 12 月底比买入价跌 20% 的概率 ${g(n=>n.lo27<=-.2)}，半年内跌 40% 的概率 ${g(n=>n.lo126<=-.4)}。`}
+  $('ruleNote').textContent=`多等几天，碰到止盈线的可能会变大：5 天内 ${g(n=>n.hi5>=tp)}，到 12 月底 ${g(n=>n.hi27>=tp)}。`}
 function renderMap(){const open=val('open'),offer=val('offer');
   const up=[1,.75,.5,.4,.3,.2,.1].map(r=>[open*(1+r),'涨到']),dn=[-.05,-.1,-.15,-.2,-.3,-.4].map(r=>[open*(1+r),'跌到']);
   if(offer<open*.985&&offer>open*.55)dn.push([offer,'跌到']);dn.sort((a,b)=>b[0]-a[0]);
