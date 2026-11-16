@@ -233,6 +233,22 @@ td.h{transition:background-color .25s}
   </section>
 
   <section class="panel">
+    <div class="ph"><h2>先看英伟达：它的财报比 ANT 早一天半</h2><p>北京时间 11-18 早上约 5:20 公布</p></div>
+    <div class="pb">
+      <p class="say">为什么要看它：英伟达是 AI 行业的风向标，又是 Anthropic 的股东和芯片供应商。它财报后的涨跌，会直接带动 ANT 开盘那天的情绪。</p>
+      <dl class="stats" style="margin-top:0">
+        <div><dt>市场预期这一季收入</dt><dd>1,088 亿美元</dd></div>
+        <div><dt>最关键：对下一季的预测</dt><dd>要明显高于 1,245 亿</dd></div>
+        <div><dt>市场押它财报后的涨跌幅</dt><dd>上下约 10%</dd></div>
+        <div><dt>过去 4 次财报后第二天</dt><dd>3 次跌，1 次涨</dd></div>
+      </dl>
+      <div class="f" style="margin:14px 0 8px;font-size:13px;color:var(--ink2);white-space:normal">点一下，看三种结果对 ANT 开盘价预测的影响（幅度是假设值，不是测出来的）</div>
+      <div class="seg" id="nv" style="width:100%"><button type="button" data-k="-0.08" aria-pressed="false" style="flex:1">财报后大跌</button><button type="button" data-k="0" aria-pressed="true" style="flex:1">没大动静</button><button type="button" data-k="0.08" aria-pressed="false" style="flex:1">财报后大涨</button></div>
+      <p class="note" id="nvNote"></p>
+    </div>
+  </section>
+
+  <section class="panel">
     <div class="ph"><h2><small>第一步</small>开盘价会是多少</h2><p>历史定价规律与市场盘口，按各自误差大小加权</p></div>
     <div class="pb"><p class="say" id="say1"></p></div>
     <div class="pb two" style="padding-top:0">
@@ -443,6 +459,13 @@ $('open').addEventListener('input',()=>{$('track').classList.remove('hint');fast
 const jump=z=>()=>{const v=Math.round(openModel().q(z)*2)/2;$('open').value=v;fast()};
 $('b25').addEventListener('click',jump(Z.p25));$('b50').addEventListener('click',jump(0));$('b75').addEventListener('click',jump(Z.p75));
 for(const b of $('hz').children)b.addEventListener('click',()=>{S.hz=+b.dataset.v;for(const o of $('hz').children)o.setAttribute('aria-pressed',o===b?'true':'false');renderFan()});
-renderSim();all();let rz=0;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(all,120)});
+
+const NV={base:null,k:0};
+function applyNv(){if(NV.base==null)NV.base={perp:val('perp'),pm:val('pm')};$('perp').value=(NV.base.perp*(1+NV.k)).toFixed(1);$('pm').value=(NV.base.pm*(1+NV.k)).toFixed(1);
+  const m=openModel();$('nvNote').textContent=NV.k===0?`现在的预测：开盘价最可能在 ${usd(m.q(0))} 上下。`:`假设英伟达${NV.k>0?'大涨':'大跌'}、市场对 ANT 的押注价跟着${NV.k>0?'高':'低'} 8%：开盘价最可能在 ${usd(m.q(0))} 上下。`;
+  const v=Math.round(m.q(0)*2)/2;$('open').value=v;all()}
+for(const b of $('nv').children)b.addEventListener('click',()=>{NV.k=+b.dataset.k;for(const o of $('nv').children)o.setAttribute('aria-pressed',o===b?'true':'false');applyNv()});
+for(const id of ['perp','pm'])$(id).addEventListener('change',()=>{NV.base=null;NV.k=0});
+renderSim();all();applyNv();let rz=0;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(all,120)});
 </script>
 </body></html>
