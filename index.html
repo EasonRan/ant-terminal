@@ -384,7 +384,7 @@ function wavg(key,filter){let s=0,t=0;for(const n of N){if(n[key]==null||!filter
 function ncdf(x){const t=1/(1+.2316419*Math.abs(x)),d=.3989423*Math.exp(-x*x/2);const p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return x>0?1-p:p}
 const Z={p10:-1.2816,p25:-.6745,p50:0,p75:.6745,p90:1.2816};
 const S={hz:27,ev:{}};
-const EV=[['rival','对手发布更便宜、更强的模型',-.17,'照 2025-01 DeepSeek 那天英伟达 −17%'],['export','模型出口再被限制',-.07,'照 2025-04 英伟达对华芯片被限当天 −6.9%'],['short','知名空头发报告点名',-.11,'六家知名空头的 383 份报告，发布后 3 天平均 −11.2%'],['fed','美联储一次加 0.5 厘',-.04,'意外多加 0.25 厘，大盘约 −1%（Bernanke-Kuttner）；ANT 按纳指 3 倍估'],['init','分析师首次发报告',.035,'静默期结束前后 5 天平均多涨 3%–4%（Bradley-Jordan-Ritter）'],['lock','解禁日',-.015,'解禁前后 3 天平均 −1.5%（Field-Hanka）']];
+const EV=[['rival','对手发布更便宜、更强的模型',-.17,'照 2025-01 DeepSeek 那天英伟达 −17%'],['export','模型出口再被限制',-.07,'照 2025-04 英伟达对华芯片被限当天 −6.9%'],['short','知名空头发报告点名',-.11,'六家知名空头的 383 份报告，发布后 3 天平均 −11.2%'],['fed','美联储一次加 0.5 厘',-.04,'意外多加 0.25 厘，大盘约 −1%（Bernanke-Kuttner）；ANT 按纳指 3 倍估'],['init','分析师首次发报告',.035,'静默期结束前后 5 天平均多涨 3%–4%（Bradley-Jordan-Ritter）'],['lock','解禁日',-.015,'解禁前后 3 天平均 −1.5%（Field-Hanka）'],['beat','第一份财报大超预期',.15,'这一年 AI 公司财报后大涨的 9 次，第二天平均 +15.5%'],['deal','中美达成新协议',.05,'照 2025-05 中美日内瓦休战当天纳指 +4.3%、英伟达 +5.4%'],['hold','美联储意外不加息',.04,'意外少加 0.25 厘，大盘约 +1%；ANT 按纳指 3 倍估'],['peace','中东停火',.04,'照 2026-04 美伊停火当天标普 +2% 到 +2.5%；ANT 按两倍估']];
 function SH(){let s=1;for(const e of EV)if(S.ev[e[0]])s*=1+e[2];return s}
 const val=id=>{const v=parseFloat($(id).value);return isFinite(v)?v:0};
 function openModel(){const offer=Math.max(1,val('offer')),ratio=$('above').value==='1'?1.52:1.11,sdH=.22,sdM=.20;
@@ -484,7 +484,7 @@ function saySteps(m){const L=val('limit'),open=val('open'),offer=m.offer,prem=op
   const stake=val('stake'),tp=val('tp')/100,sl=val('sl')/100,pA=prob(n=>n.c2==null?null:n.hi2>=tp),pD=prob(n=>n.c2==null?null:(n.hi2<tp&&n.c2<-sl)),pUp=prob(n=>n.c2==null?null:(n.hi2>=tp||n.c2>0));
   say('say3',`大白话：投 <b>${usd(stake)}</b>，止盈线 ${pct(tp)}。头两天里，碰到止盈线的可能是 <b>${fmt(pA*100)}%</b>（赚约 ${usd(stake*tp)}）；两天后是赚的可能合计 <b>${fmt(pUp*100)}%</b>；亏超过 ${fmt(sl*100)}% 的可能是 <b>${fmt(pD*100)}%</b>（亏约 ${usd(stake*Math.abs(wavg('c2',n=>n.hi2<tp&&n.c2<-sl)))}）。`)}
 
-function renderEv(){$('evs').innerHTML=EV.map(e=>`<button type="button" class="ev" data-k="${e[0]}" aria-pressed="${S.ev[e[0]]?'true':'false'}"><b>${e[1]}</b><i class="${cls(e[2])}">${pct(e[2],Math.abs(e[2])<.05?1:0)}</i><small>${e[3]}</small></button>`).join('');
+function renderEv(){$('evs').innerHTML=EV.slice().sort((x,y)=>y[2]-x[2]).map(e=>`<button type="button" class="ev" data-k="${e[0]}" aria-pressed="${S.ev[e[0]]?'true':'false'}"><b>${e[1]}</b><i class="${cls(e[2])}">${pct(e[2],Math.abs(e[2])<.05?1:0)}</i><small>${e[3]}</small></button>`).join('');
   for(const b of $('evs').children)b.addEventListener('click',()=>{S.ev[b.dataset.k]=!S.ev[b.dataset.k];renderEv();fast()});
   const on=EV.filter(e=>S.ev[e[0]]);say('say4',on.length?`已打开 ${on.length} 件事，合计让价格大约 <b>${pct(SH()-1)}</b>。上面的图和下面的价位地图已经按这个幅度挪过了。`:'大白话：现在没有打开任何事件，页面显示的是"没有意外"时的情况。点下面任何一件事，看价格大概会被带到哪。')}
 let raf=0;
