@@ -233,7 +233,7 @@ td.h{transition:background-color .25s}
       </div>
       <div>
         <div class="chart"><svg id="dens" viewBox="0 0 620 250" role="img" aria-label="开盘价概率分布"></svg></div>
-        <div class="legend"><span><i style="background:var(--accent-mid)"></i>一半的可能</span><span><i style="background:var(--accent-soft)"></i>八成的可能</span><span><i class="l" style="border-color:var(--muted)"></i>发行价</span><span><i class="l" style="border-color:var(--ink)"></i>你的限价</span></div>
+        <p class="note" style="margin:6px 0 8px">怎么看：横着是开盘价，山越高的地方越可能开在那里。深色那块占一半的可能，加上两边浅色共占八成；再往外两头各只剩一成。</p><div class="legend"><span><i style="background:var(--accent-mid)"></i>一半的可能落在这段</span><span><i style="background:var(--accent-soft)"></i>八成的可能落在这段</span><span><i class="l" style="border-color:var(--muted)"></i>发行价</span><span><i class="l" style="border-color:var(--ink)"></i>你的限价</span></div>
       </div>
     </div>
   </section>
@@ -340,7 +340,7 @@ function renderOpen(m){const L=val('limit');
   let s=`<path d="${area(m.q(Z.p10),m.q(Z.p90))}" fill="var(--accent-soft)"/><path d="${area(m.q(Z.p25),m.q(Z.p75))}" fill="var(--accent-mid)"/>`;
   s+=`<path d="${pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+','+p[1].toFixed(1)).join('')}" fill="none" stroke="var(--accent)" stroke-width="2"/>`;
   s+=`<line x1="${ml}" x2="${ml+pw}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line2)"/>`;
-  for(const [k,lab] of [['p10','一成'],['p25',''],['p50','中位'],['p75',''],['p90','九成']]){const v=m.q(Z[k]);s+=`<line x1="${X(v)}" x2="${X(v)}" y1="${Y(0)}" y2="${Y(0)+5}" stroke="var(--muted)"/><text x="${X(v)}" y="${Y(0)+20}" text-anchor="middle" font-size="12.5" font-family="var(--mono)" fill="var(--ink)">${usd(v)}</text>`;if(lab)s+=`<text x="${X(v)}" y="${Y(0)+35}" text-anchor="middle" font-size="11" fill="var(--muted)">${lab}</text>`}
+  for(const [k,lab] of [['p10','很少低于这'],['p25',''],['p50','最可能'],['p75',''],['p90','很少高于这']]){const v=m.q(Z[k]);s+=`<line x1="${X(v)}" x2="${X(v)}" y1="${Y(0)}" y2="${Y(0)+5}" stroke="var(--muted)"/><text x="${X(v)}" y="${Y(0)+20}" text-anchor="middle" font-size="12.5" font-family="var(--mono)" fill="var(--ink)">${usd(v)}</text>`;if(lab)s+=`<text x="${X(v)}" y="${Y(0)+35}" text-anchor="middle" font-size="11" fill="var(--muted)">${lab}</text>`}
   const mark=(v,col,lab,dy)=>{if(v<x0||v>x1)return'';const xx=X(v),anchor=xx>W-90?'end':xx<90?'start':'middle';return `<line x1="${xx}" x2="${xx}" y1="${mt-6+dy}" y2="${Y(0)}" stroke="${col}" stroke-width="1.5" stroke-dasharray="5 4"/><text x="${xx}" y="${mt-11+dy}" text-anchor="${anchor}" font-size="11.5" fill="${col}">${lab} ${usd(v)}</text>`};
   s+=mark(m.offer,'var(--muted)','发行价',0)+mark(L,'var(--ink)','限价',Math.abs(X(L)-X(m.offer))<70?14:0);
   $('dens').innerHTML=s}
